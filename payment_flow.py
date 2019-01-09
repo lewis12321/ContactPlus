@@ -1,23 +1,131 @@
+import urllib
 from datetime import datetime
 
 import requests
 
-cert=('public.pem', 'private.key')
+cert = ('public.pem', 'private.key')
+client_id = "c36ffb7b-e96b-4472-b3e1-5e94ab0435d7"
 
 
 def client_assertion():
     url = "https://jwkms.ob.forgerock.financial/api/crypto/signClaims"
-    issuer_id = "d3b55437-7654-41d5-94c3-89fca88d65b8"
     payload = {
-        "sub": issuer_id,
+        "sub": client_id,
         "exp": datetime.now().timestamp() + 60,
         "aud": "https://matls.as.aspsp.ob.forgerock.financial/oauth2/openbanking"
     }
     headers = {
-        'issuerId': issuer_id
+        'issuerId': client_id
     }
     response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
     print(response.text)
+    return response.text
 
 
-client_assertion()
+def client_credentials(client_assertion):
+    url = "https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/access_token"
+
+    payload = f"grant_type=client_credentials&scope=openid%20accounts%20payments&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&client_assertion={client_assertion}"
+    headers = {
+        'Content-Type': "application/x-www-form-urlencoded",
+    }
+    response = requests.request("POST", url, headers=headers, data=payload, cert=cert)
+
+    print(response.json())
+    return response.json()
+
+
+def create_payment_request(access_token):
+    payload = {
+        "Data": {
+            "Initiation": {
+                "InstructionIdentification": "ACME412",
+                "EndToEndIdentification": "FRESCO.21302.GFX.20",
+                "InstructedAmount": {
+                    "Amount": "250.88",
+                    "Currency": "GBP"
+                },
+                "CreditorAccount": {
+                    "SchemeName": "SortCodeAccountNumber",
+                    "Identification": "20793443634639",
+                    "Name": "demo"
+                }
+            }
+        },
+        "Risk": {}
+    }
+
+    url = "https://rs.aspsp.ob.forgerock.financial:443/open-banking/v2.0/payments"
+
+    headers = {
+        'Authorization': f"Bearer {access_token['access_token']}",
+        'x-idempotency-key': "FRESCO.21302.GFX.20",
+        'x-fapi-financial-id': "0015800001041REAAY",
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
+
+    print(response.text)
+    return response.json()
+
+
+def generate_request_params(payment_request):
+    import requests
+
+    url = "https://jwkms.ob.forgerock.financial:443/api/crypto/signClaims"
+    payment_id = payment_request['Data']['PaymentId']
+
+    payload = {
+        "aud": "https://matls.as.aspsp.ob.forgerock.financial/oauth2/openbanking",
+        "scope": "openid accounts payments",
+        "iss": client_id,
+        "claims": {
+            "id_token": {
+                "acr": {
+                    "value": "urn:openbanking:psd2:sca",
+                    "essential": True
+                },
+                "openbanking_intent_id": {
+                    "value": f"{payment_id}",
+                    "essential": True
+                }
+            },
+            "userinfo": {
+                "openbanking_intent_id": {
+                    "value": f"{payment_id}",
+                    "essential": True
+                }
+            }
+        },
+        "response_type": "code id_token",
+        "redirect_uri": "https://www.google.com",
+        "state": "10d260bf-a7d9-444a-92d9-7b7a5f088208",
+        "exp": datetime.now().timestamp() + 60,
+        "nonce": "10d260bf-a7d9-444a-92d9-7b7a5f088208",
+        "client_id": f"{client_id}"
+    }
+
+    headers = {
+        'jwkUri': "https://as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/connect/jwk_uri",
+        'issuerId': client_id,
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
+
+    print(response.text)
+    return response.text
+
+
+def generate_hybrid_flow(request_param):
+
+    url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id=c36ffb7b-e96b-4472-b3e1-5e94ab0435d7&state=10d260bf-a7d9-444a-92d9-7b7a5f088208&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri=https://www.google.com&request={request_param}"
+
+    print(url)
+
+
+
+client_assertion = client_assertion()
+access_token = client_credentials(client_assertion)
+payment_request = create_payment_request(access_token)
+request_param = generate_request_params(payment_request)
+generate_hybrid_flow(request_param)
