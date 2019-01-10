@@ -1,3 +1,4 @@
 .idea/
 private.key
 public.pem
+.env
