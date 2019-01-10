@@ -189,8 +189,5 @@ def exchange():
     print(request.data)
     return ""
 
-
-app.run(port=55555)
-
 # payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)
 # payment_submission(payment_token, payment_request)
