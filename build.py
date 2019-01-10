@@ -8,7 +8,7 @@ print(env)
 print(private_key)
 print(public_cert)
 
-if env == 'TEST':
+if env == "TEST":
     f = open("private.key", "w+")
     f.write(private_key)
     f.close()
