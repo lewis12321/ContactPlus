@@ -13,7 +13,7 @@ if os.environ.get('ENV') == "TEST":
     private_key.write(os.environ.get('PRIVATE_KEY').encode())
     public_cert.close()
     private_key.close()
-    cert = (public_cert, private_key)
+    cert = (public_cert.name, private_key.name)
 else:
     cert = ('public.pem', 'private.key')
 
