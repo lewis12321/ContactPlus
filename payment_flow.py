@@ -1,4 +1,5 @@
 import os
+import tempfile
 from datetime import datetime
 
 import requests
@@ -6,11 +7,18 @@ import requests
 cert = ()
 
 if os.environ.get('ENV') == "TEST":
-    cert = (os.environ.get('PUBLIC_CERT'), os.environ.get('PRIVATE_KEY'))
+    public_cert = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
+    private_key = tempfile.NamedTemporaryFile(delete=False, suffix=".key")
+    public_cert.write(os.environ.get('PUBLIC_CERT').encode())
+    private_key.write(os.environ.get('PRIVATE_KEY').encode())
+    public_cert.close()
+    private_key.close()
+    cert = (public_cert, private_key)
 else:
     cert = ('public.pem', 'private.key')
 
 client_id = "494123ab-06d6-40e4-8f65-98f6d4d47871"
+
 
 def client_assertion():
     url = "https://jwkms.ob.forgerock.financial/api/crypto/signClaims"
