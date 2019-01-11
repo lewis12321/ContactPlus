@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-import sys
 
 app = Flask(__name__)
 
@@ -12,5 +11,4 @@ def index():
 @app.route("/", methods=["POST"])
 def exchange():
     print(request.data)
-    sys.stdout.write(request.data)
     return ""

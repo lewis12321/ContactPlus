@@ -4,6 +4,7 @@
 <body>
 <h1>Yo ben it works!</h1>
 <script>
+  document.location.reload()
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -12,6 +13,7 @@
   };
   xhttp.open("POST", "/", true);
   xhttp.send(window.location.hash);
+
 </script>
 </body>
 </html>
