@@ -17,7 +17,7 @@ if os.environ.get('ENV') == "TEST":
 else:
     cert = ('public.pem', 'private.key')
 
-client_id = "494123ab-06d6-40e4-8f65-98f6d4d47871"
+client_id = "ebce07ef-e23a-4b61-924b-d7426b77880a"
 
 
 def client_assertion():
