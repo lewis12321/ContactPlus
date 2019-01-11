@@ -1,9 +1,22 @@
-import urllib
+import os
+import tempfile
 from datetime import datetime
 
 import requests
 
-cert = ('public.pem', 'private.key')
+cert = ()
+
+if os.environ.get('ENV') == "TEST":
+    public_cert = tempfile.temporaryFile(delete=False)
+    private_key = tempfile.temporaryFile(delete=False)
+    public_cert.write(os.environ.get('PUBLIC_CERT'))
+    private_key.write(os.environ.get('PRIVATE_KEY'))
+    public_cert.close()
+    private_key.close()
+    cert = (public_cert, private_key)
+else:
+    cert = ('public.pem', 'private.key')
+
 client_id = "494123ab-06d6-40e4-8f65-98f6d4d47871"
 
 
