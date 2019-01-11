@@ -1,1 +1,2 @@
-web: gunicorn payment_flow:app
+release: python build.py
+web: gunicorn server:app

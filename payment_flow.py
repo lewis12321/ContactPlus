@@ -177,17 +177,5 @@ payment_request = create_payment_request(access_token)
 request_param = generate_request_params(payment_request)
 generate_hybrid_flow(request_param)
 
-from flask import Flask, render_template, request
-
-app = Flask(__name__)
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-@app.route("/", methods=["POST"])
-def exchange():
-    print(request.data)
-    return ""
-
 # payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)
 # payment_submission(payment_token, payment_request)
