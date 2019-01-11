@@ -130,7 +130,7 @@ def generate_request_params(payment_request):
 
 
 def generate_hybrid_flow(request_param):
-    url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id=c36ffb7b-e96b-4472-b3e1-5e94ab0435d7&state=10d260bf-a7d9-444a-92d9-7b7a5f088208&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri=http://81.2.152.3:5000&request={request_param}"
+    url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id={client_id}&state=10d260bf-a7d9-444a-92d9-7b7a5f088208&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri=http://81.2.152.3:5000&request={request_param}"
 
     print(url)
 
