@@ -7,8 +7,8 @@ import requests
 cert = ()
 
 if os.environ.get('ENV') == "TEST":
-    public_cert = tempfile.TemporaryFile(delete=False)
-    private_key = tempfile.TemporaryFile(delete=False)
+    public_cert = tempfile.NamedTemporaryFile(delete=False)
+    private_key = tempfile.NamedTemporaryFile(delete=False)
     public_cert.write(os.environ.get('PUBLIC_CERT'))
     private_key.write(os.environ.get('PRIVATE_KEY'))
     public_cert.close()
