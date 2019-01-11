@@ -18,6 +18,7 @@ else:
     cert = ('public.pem', 'private.key')
 
 client_id = "ebce07ef-e23a-4b61-924b-d7426b77880a"
+redirect_uri = "https://contactplustest.herokuapp.com"
 
 
 def client_assertion():
@@ -111,7 +112,7 @@ def generate_request_params(payment_request):
             }
         },
         "response_type": "code id_token",
-        "redirect_uri": "http://81.2.152.3:5000",
+        "redirect_uri": f"{redirect_uri}",
         "state": "10d260bf-a7d9-444a-92d9-7b7a5f088208",
         "exp": datetime.now().timestamp() + 60,
         "nonce": "10d260bf-a7d9-444a-92d9-7b7a5f088208",
@@ -130,7 +131,7 @@ def generate_request_params(payment_request):
 
 
 def generate_hybrid_flow(request_param):
-    url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id={client_id}&state=10d260bf-a7d9-444a-92d9-7b7a5f088208&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri=http://81.2.152.3:5000&request={request_param}"
+    url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id={client_id}&state=10d260bf-a7d9-444a-92d9-7b7a5f088208&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri={redirect_uri}&request={request_param}"
 
     print(url)
 
@@ -138,7 +139,7 @@ def generate_hybrid_flow(request_param):
 def get_access_token_for_payment_submission(exchange_code, client_assertion):
     url = "https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/access_token"
 
-    payload = f"grant_type=authorization_code&code={exchange_code}&redirect_uri=http%3A%2F%2F81.2.152.3:5000&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&client_assertion={client_assertion}"
+    payload = f"grant_type=authorization_code&code={exchange_code}&redirect_uri={redirect_uri}&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&client_assertion={client_assertion}"
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
