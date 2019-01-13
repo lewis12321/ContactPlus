@@ -15,3 +15,6 @@ def exchange():
     print(request.data)
     get_access_token_for_payment_submission()
     return ""
+
+
+app.run(host="0.0.0.0", port=55555)
