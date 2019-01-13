@@ -4,18 +4,16 @@ from datetime import datetime
 
 import requests
 
-cert = ()
-
-if os.environ.get('ENV') == "TEST":
-    public_cert = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
-    private_key = tempfile.NamedTemporaryFile(delete=False, suffix=".key")
-    public_cert.write(os.environ.get('PUBLIC_CERT').encode())
-    private_key.write(os.environ.get('PRIVATE_KEY').encode())
-    public_cert.close()
-    private_key.close()
-    cert = (public_cert.name, private_key.name)
-else:
-    cert = ('public.pem', 'private.key')
+public_cert = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
+private_key = tempfile.NamedTemporaryFile(delete=False, suffix=".key")
+public_cert.write(os.environ.get('PUBLIC_CERT').replace("\\n", "\n").encode())
+private_key.write(os.environ.get('PRIVATE_KEY').replace("\\n", "\n").encode())
+public_cert.close()
+private_key.close()
+print(public_cert.name)
+print(private_key.name)
+cert = (public_cert.name, private_key.name)
+print(os.environ.get('PUBLIC_CERT'))
 
 client_id = "ebce07ef-e23a-4b61-924b-d7426b77880a"
 redirect_uri = "https://contactplustest.herokuapp.com"

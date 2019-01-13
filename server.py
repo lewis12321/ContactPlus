@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 
+from payment_flow import get_access_token_for_payment_submission
+
 app = Flask(__name__)
 
 
@@ -11,4 +13,5 @@ def index():
 @app.route("/", methods=["POST"])
 def exchange():
     print(request.data)
+    get_access_token_for_payment_submission()
     return ""

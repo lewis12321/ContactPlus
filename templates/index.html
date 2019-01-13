@@ -1,24 +1,20 @@
 <html>
-<head>
-</head>
-<body>
-<h1>Yo ben it works!</h1>
-<script>
+   <head></head>
+   <body>
+      <h1>Yo ben it works!</h1>
+      <script>
+         window.onload = getUrl();
 
-  window.onload = getUrl();
-
-  function getUrl() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("demo").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("POST", "/", true);
-  xhttp.send(window.location.hash);
-  }
-
-
-</script>
-</body>
+         function getUrl() {
+           var xhttp = new XMLHttpRequest();
+           xhttp.onreadystatechange = function() {
+           if (this.readyState == 4 && this.status == 200) {
+             document.getElementById("demo").innerHTML = this.responseText;
+           }
+         };
+         xhttp.open("POST", "/", true);
+         xhttp.send(window.location.hash);
+         }
+      </script>
+   </body>
 </html>
