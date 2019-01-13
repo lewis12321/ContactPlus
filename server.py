@@ -1,8 +1,10 @@
 import os
+from urllib import parse
 
+import urllib3
 from flask import Flask, render_template, request
 
-from payment_flow import get_access_token_for_payment_submission
+from payment_flow import get_access_token_for_payment_submission, client_assertion
 
 app = Flask(__name__)
 
@@ -15,7 +17,9 @@ def index():
 @app.route("/", methods=["POST"])
 def exchange():
     print(request.data)
-    get_access_token_for_payment_submission()
+    qs = parse.parse_qs(parse.urlsplit(request.data).query)
+    print(qs)
+    get_access_token_for_payment_submission(qs['code'], client_assertion)
     return ""
 
 
