@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request
 
 from payment_flow import get_access_token_for_payment_submission
@@ -17,4 +19,4 @@ def exchange():
     return ""
 
 
-app.run(host="0.0.0.0", port=55555)
+app.run(host="0.0.0.0", port=os.getenv('PORT', 55555))
