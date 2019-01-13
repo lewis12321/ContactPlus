@@ -17,9 +17,9 @@ def index():
 @app.route("/", methods=["POST"])
 def exchange():
     print(request.data)
-    qs = parse.parse_qs(parse.urlsplit(request.data).query)
-    print(qs)
-    get_access_token_for_payment_submission(qs['code'], client_assertion)
+    fragment = parse.parse_qs(parse.urlsplit(request.data).fragment)
+    print(fragment)
+    get_access_token_for_payment_submission(fragment['code'], client_assertion)
     return ""
 
 
