@@ -10,16 +10,13 @@ public_cert.write(os.environ.get('PUBLIC_CERT').replace("\\n", "\n").encode())
 private_key.write(os.environ.get('PRIVATE_KEY').replace("\\n", "\n").encode())
 public_cert.close()
 private_key.close()
-print(public_cert.name)
-print(private_key.name)
 cert = (public_cert.name, private_key.name)
-print(os.environ.get('PUBLIC_CERT'))
 
 client_id = "ebce07ef-e23a-4b61-924b-d7426b77880a"
 redirect_uri = "https://contactplustest.herokuapp.com"
 
 
-def client_assertion():
+def get_client_assertion():
     url = "https://jwkms.ob.forgerock.financial/api/crypto/signClaims"
     payload = {
         "sub": client_id,
@@ -183,11 +180,12 @@ def payment_submission(payment_token, payment_request):
     print(response.text)
 
 
-client_assertion = client_assertion()
-access_token = client_credentials(client_assertion)
-payment_request = create_payment_request(access_token)
-request_param = generate_request_params(payment_request)
-generate_hybrid_flow(request_param)
+def setup_payment():
+    client_assertion = get_client_assertion()
+    access_token = client_credentials(client_assertion)
+    payment_request = create_payment_request(access_token)
+    request_param = generate_request_params(payment_request)
+    generate_hybrid_flow(request_param)
 
 # payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)
 # payment_submission(payment_token, payment_request)
