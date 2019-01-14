@@ -15,7 +15,7 @@ def index():
 def exchange():
     fragment = parse.parse_qs(parse.urlsplit(request.data).fragment.decode("utf-8"))
     print(fragment)
-    get_access_token_for_payment_submission(fragment['code'], get_client_assertion)
+    get_access_token_for_payment_submission(fragment['code'][0], get_client_assertion)
     return ""
 
 
