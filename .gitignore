@@ -2,3 +2,6 @@
 private.key
 public.pem
 .env
+__pycache__/
+test.env
+.DS_Store
