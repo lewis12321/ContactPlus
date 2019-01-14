@@ -132,7 +132,7 @@ def generate_hybrid_flow(request_param):
     return url
 
 
-def get_access_token_for_payment_submission(exchange_code, client_assertion):
+def get_access_token_for_payment_submission(exchange_code, client_assertion, redirect_uri):
     url = "https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/access_token"
 
     payload = f"grant_type=authorization_code&code={exchange_code}&redirect_uri={redirect_uri}&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&client_assertion={client_assertion}"
