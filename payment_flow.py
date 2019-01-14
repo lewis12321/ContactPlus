@@ -129,6 +129,7 @@ def generate_hybrid_flow(request_param):
     url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id={client_id}&state=10d260bf-a7d9-444a-92d9-7b7a5f088208&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri={redirect_uri}&request={request_param}"
 
     print(url)
+    return url
 
 
 def get_access_token_for_payment_submission(exchange_code, client_assertion):
@@ -185,7 +186,7 @@ def setup_payment():
     access_token = client_credentials(client_assertion)
     payment_request = create_payment_request(access_token)
     request_param = generate_request_params(payment_request)
-    generate_hybrid_flow(request_param)
+    return generate_hybrid_flow(request_param)
 
 # payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)
 # payment_submission(payment_token, payment_request)

@@ -21,7 +21,8 @@ def exchange():
 
 @app.route("/payment/", methods=["GET"])
 def payment():
-    setup_payment()
-    return ""
+    url = setup_payment()
+    return render_template("payment.html", url=url)
+
 
 app.run(host="0.0.0.0", port=os.getenv('PORT', 55555))
