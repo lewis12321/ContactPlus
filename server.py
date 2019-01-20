@@ -17,10 +17,15 @@ def index():
 
 @app.route("/", methods=["POST"])
 def exchange():
+    print("Submitting Payment")
     fragment = parse.parse_qs(parse.urlsplit(request.data).fragment.decode("utf-8"))
+    print("1...")
     exchange_code = fragment['code'][0]
+    print("2...")
     state = fragment['state'][0]
+    print("3...")
     make_payment(get_client_assertion(), exchange_code, state)
+    print("4...")
     return render_template("success.html", response="Success")
 
 
