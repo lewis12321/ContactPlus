@@ -11,10 +11,6 @@ app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.DEBUG)
 
-req_log = logging.getLogger('requests.packages.urllib3')
-req_log.setLevel(logging.DEBUG)
-req_log.propagate = True
-
 redirect_uri = "https://contactplustest.herokuapp.com"
 
 

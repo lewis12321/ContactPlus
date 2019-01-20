@@ -147,8 +147,8 @@ def get_access_token_for_payment_submission(exchange_code, client_assertion, red
         'Content-Type': "application/x-www-form-urlencoded",
     }
 
-    req = requests.Request("POST", url, data=payload, headers=headers, cert=cert).prepare()
-    print_request(req)
+    prepare = requests.Request("POST", url, data=payload, headers=headers).prepare()
+    print_request(prepare)
 
     response = requests.request("POST", url, data=payload, headers=headers, cert=cert)
 
