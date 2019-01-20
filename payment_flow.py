@@ -33,7 +33,7 @@ def get_client_assertion():
         'issuerId': client_id
     }
     response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
-    client_assertion = response
+    print(f'Got client assertion: {response.text}')
     return response.text
 
 
