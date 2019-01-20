@@ -136,7 +136,7 @@ def generate_hybrid_flow(request_param, state):
     return url
 
 
-def get_access_token_for_payment_submission(exchange_code, client_assertion, redirect_uri):
+def get_access_token_for_payment_submission(client_assertion, exchange_code, redirect_uri):
     url = "https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/access_token"
 
     payload = f"grant_type=authorization_code&code={exchange_code}" \
@@ -146,9 +146,6 @@ def get_access_token_for_payment_submission(exchange_code, client_assertion, red
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
-
-    prepare = requests.Request("POST", url, data=payload, headers=headers).prepare()
-    print_request(prepare)
 
     response = requests.request("POST", url, data=payload, headers=headers, cert=cert)
 
@@ -215,11 +212,3 @@ def make_payment(client_assertion, exchange_code, state):
     response = dynamodb.get_item(TableName='Payments', Key={'state': {'S': str(state)}})
     payment_id = json.loads(response['Item']["data"]['S'])['Data']['PaymentId']
     payment_submission(payment_token, payment_id)
-
-def print_request(req):
-    print('HTTP/1.1 {method} {url}\n{headers}\n\n{body}'.format(
-        method=req.method,
-        url=req.url,
-        headers='\n'.join('{}: {}'.format(k, v) for k, v in req.headers.items()),
-        body=req.body,
-    ))
