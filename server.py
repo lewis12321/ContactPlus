@@ -27,6 +27,7 @@ def exchange():
     print("3...")
     make_payment(get_client_assertion(), exchange_code, state)
     print("4...")
+    sys.stdout.flush()
     return render_template("success.html", response="Success")
 
 
@@ -34,6 +35,7 @@ def exchange():
 def payment():
     print("Creating Payment...")
     url = setup_payment()
+    sys.stdout.flush()
     return redirect(url)
 
 if __name__ == "__main__":
