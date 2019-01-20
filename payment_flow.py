@@ -156,13 +156,9 @@ def get_access_token_for_payment_submission(client_assertion, exchange_code, red
 def payment_submission(access_token, payment):
     url = "https://rs.aspsp.ob.forgerock.financial:443/open-banking/v2.0/payment-submissions"
 
-    payload = {
-        "Data": {
-            "PaymentId": f"{payment['Data']['PaymentId']}",
-            "Initiation": payment['Data']['Initiation']
-        },
-        "Risk": payment['Data']['Risk']
-    }
+    payload = dict(payment)
+    payload.pop('CreationDateTime', None)
+    payload.pop('Status', None)
 
     headers = {
         'Authorization': f"Bearer {access_token}",
