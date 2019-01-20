@@ -4,8 +4,8 @@ import sys
 from urllib import parse
 from flask import Flask, render_template, request
 from werkzeug.utils import redirect
-
-from payment_flow import get_access_token_for_payment_submission, get_client_assertion, setup_payment, make_payment
+from payment_flow import get_client_assertion, setup_payment, make_payment
+from account_handling import register_user, verify_user
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -45,9 +45,21 @@ def register():
     return render_template("register.html")
 
 
+@app.route("/register/", methods=["POST"])
+def register_logic():
+    register_user(request)
+    return redirect("/")
+
+
 @app.route("/login.html", methods=["GET"])
 def login():
     return render_template("login.html")
+
+
+@app.route("/login/", methods=["POST"])
+def login_logic():
+    verify_user(request)
+    return redirect("/")
 
 
 if __name__ == "__main__":
