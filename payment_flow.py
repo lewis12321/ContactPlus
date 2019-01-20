@@ -7,6 +7,7 @@ from datetime import datetime
 import boto3
 import requests
 
+
 public_cert = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
 private_key = tempfile.NamedTemporaryFile(delete=False, suffix=".key")
 public_cert.write(os.environ.get('PUBLIC_CERT').replace("\\n", "\n").encode())
@@ -17,6 +18,7 @@ cert = (public_cert.name, private_key.name)
 
 client_id = "ebce07ef-e23a-4b61-924b-d7426b77880a"
 redirect_uri = "https://contactplustest.herokuapp.com"
+dynamodb = boto3.client('dynamodb', region_name='eu-west-2')
 
 
 def get_client_assertion():
@@ -30,7 +32,7 @@ def get_client_assertion():
         'issuerId': client_id
     }
     response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
-
+    client_assertion = response
     return response.text
 
 
@@ -47,7 +49,6 @@ def client_credentials(client_assertion):
 
 
 def create_payment_request(access_token):
-
     payload = {
         "Data": {
             "Initiation": {
@@ -124,7 +125,6 @@ def generate_request_params(payment_request):
 
     response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
 
-    dynamodb = boto3.client('dynamodb', region_name='eu-west-2')
     dynamodb.put_item(TableName='Payments', Item={'state': {'S': state}, 'data': {'S': json.dumps(payment_request)}})
 
     return response.text, state
@@ -152,8 +152,7 @@ def get_access_token_for_payment_submission(exchange_code, client_assertion, red
     return response.json()
 
 
-def payment_submission(payment_token, payment_request):
-
+def payment_submission(payment_request, payment_id):
     url = "https://rs.aspsp.ob.forgerock.financial:443/open-banking/v2.0/payment-submissions"
 
     payload = {
@@ -177,7 +176,7 @@ def payment_submission(payment_token, payment_request):
     }
 
     headers = {
-        'Authorization': f"Bearer {payment_token['access_token']}",
+        'Authorization': f"Bearer {payment_id['access_token']}",
         'x-idempotency-key': "FRESCO.21302.GFX.20",
         'x-fapi-financial-id': "0015800001041REAAY"
     }
@@ -203,10 +202,12 @@ def setup_payment():
     payment_request = create_payment_request(access_token)
     request_param, state = generate_request_params(payment_request)
     auth_url = generate_hybrid_flow(request_param, state)
+    print(auth_url)
     return auth_url
 
-#def make_payment():
-    #payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)
-    #payment_submission(payment_token, payment_request)
 
-setup_payment()
+def make_payment(client_assertion, exchange_code, state):
+    payment_token = get_access_token_for_payment_submission(client_assertion, exchange_code, redirect_uri)
+    response = dynamodb.get_item(TableName='Payments', Key={'state': {'S': str(state)}})
+    payment_id = json.loads(response['Item']["data"]['S'])['Data']['PaymentId']
+    payment_submission(payment_token, payment_id)
