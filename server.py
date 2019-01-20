@@ -18,23 +18,23 @@ def index():
 
 @app.route("/", methods=["POST"])
 def exchange():
-    print("Submitting Payment", file=sys.stdout)
+    print("Submitting Payment")
     fragment = parse.parse_qs(parse.urlsplit(request.data).fragment.decode("utf-8"))
-    print("1...", file=sys.stdout)
+    print("1...")
     exchange_code = fragment['code'][0]
-    print("2...", file=sys.stdout)
+    print("2...")
     state = fragment['state'][0]
-    print("3...", file=sys.stdout)
+    print("3...")
     make_payment(get_client_assertion(), exchange_code, state)
-    print("4...", file=sys.stdout)
+    print("4...")
     return render_template("success.html", response="Success")
 
 
 @app.route("/payment/", methods=["GET"])
 def payment():
-    print("Creating Payment...", file=sys.stdout)
+    print("Creating Payment...")
     url = setup_payment()
     return redirect(url)
 
-
-app.run(host="0.0.0.0", port=os.getenv('PORT', 55555))
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=os.getenv('PORT', 55555))

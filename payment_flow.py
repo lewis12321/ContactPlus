@@ -149,7 +149,7 @@ def get_access_token_for_payment_submission(exchange_code, client_assertion, red
 
     response = requests.request("POST", url, data=payload, headers=headers, cert=cert)
 
-    print(response.text, file=sys.stdout)
+    print(response.text)
     return response.json()
 
 
@@ -184,7 +184,7 @@ def payment_submission(payment_request, payment_id):
 
     response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
 
-    print(response.text, file=sys.stdout)
+    print(response.text)
     return response.json()
 
 
@@ -203,7 +203,7 @@ def setup_payment():
     payment_request = create_payment_request(access_token)
     request_param, state = generate_request_params(payment_request)
     auth_url = generate_hybrid_flow(request_param, state)
-    print(auth_url, file=sys.stdout)
+    print(auth_url)
     return auth_url
 
 
