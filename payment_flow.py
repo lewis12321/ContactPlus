@@ -147,6 +147,9 @@ def get_access_token_for_payment_submission(exchange_code, client_assertion, red
         'Content-Type': "application/x-www-form-urlencoded",
     }
 
+    req = requests.Request("POST", url, data=payload, headers=headers, cert=cert).prepare()
+    print_request(req)
+
     response = requests.request("POST", url, data=payload, headers=headers, cert=cert)
 
     print(response.text)
@@ -212,3 +215,11 @@ def make_payment(client_assertion, exchange_code, state):
     response = dynamodb.get_item(TableName='Payments', Key={'state': {'S': str(state)}})
     payment_id = json.loads(response['Item']["data"]['S'])['Data']['PaymentId']
     payment_submission(payment_token, payment_id)
+
+def print_request(req):
+    print('HTTP/1.1 {method} {url}\n{headers}\n\n{body}'.format(
+        method=req.method,
+        url=req.url,
+        headers='\n'.join('{}: {}'.format(k, v) for k, v in req.headers.items()),
+        body=req.body,
+    ))
