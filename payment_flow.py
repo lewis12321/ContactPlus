@@ -83,8 +83,6 @@ def create_payment_request(access_token):
 
 
 def generate_request_params(payment_request):
-    import requests
-
     url = "https://jwkms.ob.forgerock.financial:443/api/crypto/signClaims"
     payment_id = payment_request['Data']['PaymentId']
     state = str(uuid.uuid4())

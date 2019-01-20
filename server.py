@@ -39,5 +39,16 @@ def payment():
     url = setup_payment()
     return redirect(url)
 
+
+@app.route("/register.html", methods=["GET"])
+def register():
+    return render_template("register.html")
+
+
+@app.route("/login.html", methods=["GET"])
+def login():
+    return render_template("login.html")
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=os.getenv('PORT', 55555))
