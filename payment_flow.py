@@ -1,7 +1,10 @@
+import json
 import os
 import tempfile
+import uuid
 from datetime import datetime
 
+import boto3
 import requests
 
 public_cert = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
@@ -44,6 +47,7 @@ def client_credentials(client_assertion):
 
 
 def create_payment_request(access_token):
+
     payload = {
         "Data": {
             "Initiation": {
@@ -81,6 +85,7 @@ def generate_request_params(payment_request):
 
     url = "https://jwkms.ob.forgerock.financial:443/api/crypto/signClaims"
     payment_id = payment_request['Data']['PaymentId']
+    state = str(uuid.uuid4())
 
     payload = {
         "aud": "https://matls.as.aspsp.ob.forgerock.financial/oauth2/openbanking",
@@ -106,7 +111,7 @@ def generate_request_params(payment_request):
         },
         "response_type": "code id_token",
         "redirect_uri": f"{redirect_uri}",
-        "state": "10d260bf-a7d9-444a-92d9-7b7a5f088208",
+        "state": state,
         "exp": datetime.now().timestamp() + 60,
         "nonce": "10d260bf-a7d9-444a-92d9-7b7a5f088208",
         "client_id": f"{client_id}"
@@ -119,18 +124,24 @@ def generate_request_params(payment_request):
 
     response = requests.request("POST", url, json=payload, headers=headers, cert=cert)
 
-    return response.text
+    dynamodb = boto3.client('dynamodb', region_name='eu-west-2')
+    dynamodb.put_item(TableName='Payments', Item={'state': {'S': state}, 'data': {'S': json.dumps(payment_request)}})
+
+    return response.text, state
 
 
-def generate_hybrid_flow(request_param):
-    url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id={client_id}&state=10d260bf-a7d9-444a-92d9-7b7a5f088208&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri={redirect_uri}&request={request_param}"
+def generate_hybrid_flow(request_param, state):
+    url = f"https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/authorize?response_type=code%20id_token&client_id={client_id}&state={state}&nonce=10d260bf-a7d9-444a-92d9-7b7a5f088208&scope=openid%20payments%20accounts&redirect_uri={redirect_uri}&request={request_param}"
     return url
 
 
 def get_access_token_for_payment_submission(exchange_code, client_assertion, redirect_uri):
     url = "https://matls.as.aspsp.ob.forgerock.financial/oauth2/realms/root/realms/openbanking/access_token"
 
-    payload = f"grant_type=authorization_code&code={exchange_code}&redirect_uri={redirect_uri}&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&client_assertion={client_assertion}"
+    payload = f"grant_type=authorization_code&code={exchange_code}" \
+              f"&redirect_uri={redirect_uri}" \
+              f"&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer" \
+              f"&client_assertion={client_assertion}"
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
@@ -190,8 +201,8 @@ def setup_payment():
     client_assertion = get_client_assertion()
     access_token = client_credentials(client_assertion)
     payment_request = create_payment_request(access_token)
-    request_param = generate_request_params(payment_request)
-    exchange_code = generate_hybrid_flow(request_param)
+    request_param, state = generate_request_params(payment_request)
+    exchange_code = generate_hybrid_flow(request_param, state)
     print(client_assertion)
     print(access_token)
     print(payment_request)
@@ -200,8 +211,8 @@ def setup_payment():
     #payment_dict = create_payment_dictionary(client_assertion, payment_request, exchange_code)
     return ""
 
-def make_payment():
-    payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)
-    payment_submission(payment_token, payment_request)
+#def make_payment():
+    #payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)
+    #payment_submission(payment_token, payment_request)
 
 setup_payment()
