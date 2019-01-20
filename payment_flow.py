@@ -153,12 +153,12 @@ def get_access_token_for_payment_submission(client_assertion, exchange_code, red
     return response.json()
 
 
-def payment_submission(payment_request, payment_id):
+def payment_submission(access_token, payment_id):
     url = "https://rs.aspsp.ob.forgerock.financial:443/open-banking/v2.0/payment-submissions"
 
     payload = {
         "Data": {
-            "PaymentId": f"{payment_request['Data']['PaymentId']}",
+            "PaymentId": f"{payment_id}",
             "Initiation": {
                 "InstructionIdentification": "ACME412",
                 "EndToEndIdentification": "FRESCO.21302.GFX.20",
@@ -177,7 +177,7 @@ def payment_submission(payment_request, payment_id):
     }
 
     headers = {
-        'Authorization': f"Bearer {payment_id['access_token']}",
+        'Authorization': f"Bearer {access_token}",
         'x-idempotency-key': "FRESCO.21302.GFX.20",
         'x-fapi-financial-id': "0015800001041REAAY"
     }
