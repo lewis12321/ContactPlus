@@ -202,14 +202,8 @@ def setup_payment():
     access_token = client_credentials(client_assertion)
     payment_request = create_payment_request(access_token)
     request_param, state = generate_request_params(payment_request)
-    exchange_code = generate_hybrid_flow(request_param, state)
-    print(client_assertion)
-    print(access_token)
-    print(payment_request)
-    print(request_param)
-    print(exchange_code)
-    #payment_dict = create_payment_dictionary(client_assertion, payment_request, exchange_code)
-    return ""
+    auth_url = generate_hybrid_flow(request_param, state)
+    return auth_url
 
 #def make_payment():
     #payment_token = get_access_token_for_payment_submission(exchange_code, client_assertion)

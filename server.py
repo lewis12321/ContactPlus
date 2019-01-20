@@ -26,6 +26,7 @@ def exchange():
 
 @app.route("/payment/", methods=["GET"])
 def payment():
+    print("Creating Payment...")
     url = setup_payment()
     return render_template("payment.html", url=url)
 
