@@ -1,4 +1,5 @@
 import os
+import logging
 import sys
 from urllib import parse
 from flask import Flask, render_template, request
@@ -7,6 +8,8 @@ from werkzeug.utils import redirect
 from payment_flow import get_access_token_for_payment_submission, get_client_assertion, setup_payment, make_payment
 
 app = Flask(__name__)
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.DEBUG)
 
 redirect_uri = "https://contactplustest.herokuapp.com"
 
@@ -27,7 +30,6 @@ def exchange():
     print("3...")
     make_payment(get_client_assertion(), exchange_code, state)
     print("4...")
-    sys.stdout.flush()
     return render_template("success.html", response="Success")
 
 
@@ -35,7 +37,6 @@ def exchange():
 def payment():
     print("Creating Payment...")
     url = setup_payment()
-    sys.stdout.flush()
     return redirect(url)
 
 if __name__ == "__main__":
