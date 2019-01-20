@@ -153,27 +153,15 @@ def get_access_token_for_payment_submission(client_assertion, exchange_code, red
     return response.json()
 
 
-def payment_submission(access_token, payment_id):
+def payment_submission(access_token, payment):
     url = "https://rs.aspsp.ob.forgerock.financial:443/open-banking/v2.0/payment-submissions"
 
     payload = {
         "Data": {
-            "PaymentId": f"{payment_id}",
-            "Initiation": {
-                "InstructionIdentification": "ACME412",
-                "EndToEndIdentification": "FRESCO.21302.GFX.20",
-                "InstructedAmount": {
-                    "Amount": "250.88",
-                    "Currency": "GBP"
-                },
-                "CreditorAccount": {
-                    "SchemeName": "SortCodeAccountNumber",
-                    "Identification": "20793443634639",
-                    "Name": "demo"
-                }
-            }
+            "PaymentId": f"{payment['Data']['PaymentId']}",
+            "Initiation": payment['Data']['Initiation']
         },
-        "Risk": {}
+        "Risk": payment['Data']['Risk']
     }
 
     headers = {
@@ -210,5 +198,5 @@ def setup_payment():
 def make_payment(client_assertion, exchange_code, state):
     payment_token = get_access_token_for_payment_submission(client_assertion, exchange_code, redirect_uri)
     response = dynamodb.get_item(TableName='Payments', Key={'state': {'S': str(state)}})
-    payment_id = json.loads(response['Item']["data"]['S'])['Data']['PaymentId']
-    payment_submission(payment_token, payment_id)
+    payment = json.loads(response['Item']["data"]['S'])
+    payment_submission(payment_token, payment)
